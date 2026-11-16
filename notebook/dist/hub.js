@@ -9,8 +9,6 @@
   const positions=[{x:50,y:100*80/560},{x:100*523.205/700,y:100*180/560},{x:100*523.205/700,y:100*380/560},{x:50,y:100*480/560},{x:100*176.795/700,y:100*380/560},{x:100*176.795/700,y:100*180/560}];
   $('brandTitle').textContent=data.siteTitle;
   $('pageTitle').textContent=data.siteTitle;
-  $('siteDescription').textContent=data.description;
-  $('updatedAt').textContent='整理于 '+data.updatedAt;
   document.title=data.siteTitle;
   document.body.dataset.theme='paper';
   categories.forEach((c,i)=>{
@@ -39,7 +37,7 @@
     $('resetLibrary').hidden=!search;
     found.forEach(n=>{
       const a=el('a','note-row');a.href=n.url;if(n.external){a.target='_blank';a.rel='noopener noreferrer';}
-      const copy=el('div','note-copy'),h=el('h3'),p=el('p','note-row-summary');mark(h,n.title,search);mark(p,n.summary,search);copy.append(h,p);
+      const copy=el('div','note-copy'),h=el('h3');mark(h,n.title,search);copy.append(h);
       const tags=el('div','note-tags');for(const tag of n.tags||[]){const t=el('span','note-tag');mark(t,tag,search);tags.append(t);}copy.append(tags);
       const date=el('time','note-date',n.date);date.dateTime=n.date;a.append(date,copy,el('span','note-arrow','↗'));$('noteList').append(a);
     });

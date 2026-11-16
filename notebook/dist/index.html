@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="六边形的学习笔记，从六种能力出发，持续记录学习、工作与生活中的积累。">
-  <meta name="theme-color" content="#f5f3ec">
+  <meta name="theme-color" content="#ffffff">
   <title>六边形的学习笔记</title>
   <link rel="stylesheet" href="./hub.css">
   <script src="./hub-data.js" defer></script>
@@ -14,38 +14,31 @@
   <a class="skip-link" href="#main">跳到主要内容</a>
   <div class="site-shell">
     <header class="site-header">
-      <a class="brand" href="./index.html" aria-label="六边形的学习笔记首页"><svg class="brand-icon" viewBox="0 0 42 46" fill="none" aria-hidden="true"><path d="M21 2 39 12.5v21L21 44 3 33.5v-21L21 2Z" stroke="currentColor" stroke-width="1.5"/><path d="M13 15v16h15M20 15v10h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="square"/></svg><span><strong id="brandTitle">六边形的学习笔记</strong><small>A GROWING NOTEBOOK</small></span></a>
+      <a class="brand" href="./index.html" aria-label="六边形的学习笔记首页"><svg class="brand-icon" viewBox="0 0 42 46" fill="none" aria-hidden="true"><path d="M21 2 39 12.5v21L21 44 3 33.5v-21L21 2Z" stroke="currentColor" stroke-width="1.5"/><path d="M13 15v16h15M20 15v10h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="square"/></svg><span><strong id="brandTitle">六边形的学习笔记</strong></span></a>
       <nav class="header-nav" aria-label="网站导航"><a class="active" href="#knowledgeMap">能力地图</a><a href="#library" id="headerAllNotes">所有笔记</a></nav>
-      <span class="header-status"><span aria-hidden="true"></span>持续积累中</span>
     </header>
     <main id="main">
-      <section class="page-intro" aria-labelledby="pageTitle">
-        <div class="intro-topline"><span>THE LEARNING ATLAS</span><span id="updatedAt"></span></div>
-        <div class="intro-title-row"><div><p class="section-eyebrow">个人成长知识库</p><h1 id="pageTitle">六边形的学习笔记</h1><p id="siteDescription" class="site-description">从六种能力出发，记录学习、工作与生活中的积累。</p></div><div class="intro-index" aria-hidden="true"><span>6</span><small>CAPABILITIES<br>ONE NOTEBOOK</small></div></div>
-      </section>
+      <h1 id="pageTitle" class="sr-only">六边形的学习笔记</h1>
       <section id="knowledgeMap" class="map-section" aria-labelledby="mapSectionTitle">
-        <div class="section-topline"><div><span class="section-number">01</span><h2 id="mapSectionTitle">六种能力 六个入口</h2></div><p>点击一个方向，进入对应模块。</p></div>
+        <h2 id="mapSectionTitle" class="sr-only">能力地图</h2>
         <div class="map-workspace">
           <div class="map-column">
             <div class="map-canvas" aria-label="六种能力的成长地图">
-              <div class="map-corner-label">SIX DIRECTIONS TO GROW</div>
               <svg class="hex-outline" viewBox="0 0 700 560" fill="none" aria-hidden="true"><polygon points="350,80 523.205,180 523.205,380 350,480 176.795,380 176.795,180"/><path class="map-tick" d="M338 17h24M350 5v24M338 543h24M350 531v24M34 270v20M24 280h20M666 270v20M656 280h20"/></svg>
-              <div class="map-core"><span class="core-kicker">MY CAPABILITY MAP</span><h3>持续学习<br>全面成长</h3><p>从理解问题，到照顾自己</p><span class="core-line" aria-hidden="true"></span><small>点击六个顶点，进入对应模块</small></div>
+              <div class="map-core"><h3>六边形</h3><p>学习笔记</p></div>
               <div id="hexNodes" class="hex-nodes" role="group" aria-label="选择成长方向"></div>
-              <div class="map-bottom-label"><span>记录理解与行动</span><span>连接专业与生活</span></div>
             </div>
             <div id="mobileDirections" class="mobile-directions" role="group" aria-label="六个成长方向"></div>
           </div>
         </div>
-        <p class="map-caption">能力地图用于归档与回顾。每个方向都可以慢慢积累，无需让六角内容一样多。</p>
       </section>
       <section id="library" class="library-section" aria-labelledby="libraryTitle">
-        <div class="section-topline"><div><span class="section-number">02</span><h2 id="libraryTitle">最近笔记</h2><span id="totalNoteCount" class="count-label"></span></div><p>沿着问题学习，也把过程记下来。</p></div>
-        <div class="library-toolbar"><div class="search-field"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="1.6"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><label for="noteSearch" class="sr-only">搜索全部笔记的标题、摘要和标签</label><input id="noteSearch" type="search" placeholder="搜索笔记标题、摘要或标签…" enterkeyhint="search" autocomplete="off"><kbd aria-hidden="true">/</kbd></div><button id="resetLibrary" class="reset-button" type="button" hidden>回到全部 <span aria-hidden="true">↗</span></button><p id="searchStatus" role="status" aria-live="polite"></p></div>
+        <div class="section-topline"><div><h2 id="libraryTitle">最近笔记</h2><span id="totalNoteCount" class="count-label"></span></div></div>
+        <div class="library-toolbar"><div class="search-field"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="1.6"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><label for="noteSearch" class="sr-only">搜索全部笔记的标题、摘要和标签</label><input id="noteSearch" type="search" placeholder="搜索笔记" enterkeyhint="search" autocomplete="off"><kbd aria-hidden="true">/</kbd></div><button id="resetLibrary" class="reset-button" type="button" hidden>回到全部 <span aria-hidden="true">↗</span></button><p id="searchStatus" role="status" aria-live="polite"></p></div>
         <div id="noteList" class="note-list"></div>
       </section>
     </main>
-    <footer class="site-footer"><div><strong>六边形的学习笔记</strong><span>记录 · 理解 · 连接</span></div><a href="#main">回到顶部 <span aria-hidden="true">↑</span></a></footer>
+    <footer class="site-footer"><a href="#main">回到顶部 ↑</a></footer>
   </div>
 </body>
 </html>
