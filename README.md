@@ -35,8 +35,10 @@ AI-Learning-Journey/
 
 [打开六边形的学习笔记](https://hxiang736.github.io/liubianxing-study-notes/)
 
-第一期整理了《从应用统计学到 AI 产品经理》的分享会，包含岗位认知、能力准备、求职方法与可选行动清单。网站支持全文搜索、目录和 Markdown 导出。
+首页以分析力、学习力、表达力、执行力、身心力和职业力六种能力组织笔记。点击六角入口进入各自的独立模块，再阅读具体文章。六边形是成长方向与内容入口，不是能力分数。
 
-正文保存在 [notebook/content/notebook.json](notebook/content/notebook.json)。修改内容并推送到 main 后，GitHub Actions 会自动重新发布网站。后续也可以在原聊天发送新资料，由助手整理更新。
+数据分析是分析维度下的栏目，已整理 SQL、Python 两篇学习笔记。机器学习入门记录归入学习维度；《AI 产品与求职笔记》是职业维度下“求职记录”中的一篇文章。表达、行动和身心等方向可按真实经历逐步补充。
+
+首页与目录配置见 [notebook/content/hub.json](notebook/content/hub.json)，具体内容维护见 [notebook/README.md](notebook/README.md)。修改后推送到 main，GitHub Actions 会自动重新发布。后续也可以在原聊天发送新资料，由助手整理更新。
 
 原有机器学习等资料继续保留在对应目录。

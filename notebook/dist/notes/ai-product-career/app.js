@@ -291,7 +291,7 @@
     });
   });
   $('goToActions').addEventListener('click', () => { clearSearch(); changeView('actions', {scroll: true}); });
-  $('homeLink').addEventListener('click', event => { event.preventDefault(); clearSearch(); changeView('notes', {scroll: true}); setMenu(false); });
+  $('homeLink').addEventListener('click', event => { event.preventDefault(); location.href = '../../'; });
   $('menuToggle').addEventListener('click', () => setMenu(!$('sidebar').classList.contains('open')));
   $('menuBackdrop').addEventListener('click', () => setMenu(false));
   $('backToTop').addEventListener('click', event => { event.preventDefault(); $('main').scrollIntoView({behavior: 'smooth', block: 'start'}); });
