@@ -185,6 +185,7 @@
     "slug": "the-power-of-complexity",
     "title": "复杂模型何时有用？资产定价与蒙特卡洛实验",
     "summary": "从资产定价的实证结果出发，用五组模拟拆解信号形状、噪声强度和特征维度对样本外表现的影响。",
+    "notebookFile": "Experiment_1_Monte_Carlo.ipynb",
     "sections": [
       {
         "heading": "从资产定价的问题出发",

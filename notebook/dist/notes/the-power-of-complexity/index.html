@@ -1,5 +1,760 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>复杂模型何时有用？资产定价与蒙特卡洛实验 · 六边形的学习笔记</title><meta name="description" content="从资产定价的实证结果出发，用五组模拟拆解信号形状、噪声强度和特征维度对样本外表现的影响。"><link rel="stylesheet" href="../../note-reader.css"></head><body><header><a class="brand" href="../../">⬡ 六边形的学习笔记</a><a href="../../modules/learning/">返回知识与方法</a></header><main><div class="breadcrumb">知识与方法 <span>/</span> 学习笔记</div><h1>复杂模型何时有用？资产定价与蒙特卡洛实验</h1><p class="summary">从资产定价的实证结果出发，用五组模拟拆解信号形状、噪声强度和特征维度对样本外表现的影响。</p><p class="meta">整理于 2026 年 11 月 23 日</p><nav class="toc" aria-label="文章目录"><a href="#s1">从资产定价的问题出发</a><a href="#s2">用五种数据生成过程拆开问题</a><a href="#s3">怎样做样本外比较</a><a href="#s4">五种情形的实验结果</a><a href="#s5">用结果判断下一步</a></nav><article><section id="s1"><h2>从资产定价的问题出发</h2><p>讲义以 Gu、Kelly 和 Xiu（2020）的研究为例。给定时点 t 已知的公司特征与宏观变量，目标是估计下一期股票超额收益的条件期望，也就是风险溢价。作者用 94 个公司特征分别与 8 个宏观变量及常数项相乘，再加上 74 个行业指标，共得到 920 个预测变量。</p><p>研究按时间划分数据，初始训练期为 1957–1974 年，验证期为 1975–1986 年，样本外测试期为 1987–2016 年，并按年重新估计。论文表 1 以零超额收益预测为基准。全特征线性回归（Huber 损失）的个股月度样本外 R² 为 −3.46%，只选规模、价值和动量的线性模型为 0.16%，随机森林为 0.33%，三层神经网络为 0.40%。全量特征容易带来过拟合，非线性模型捕捉的交互在这批数据上提供了额外的预测信息。</p></section>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>复杂模型何时有用？资产定价与蒙特卡洛实验 · 六边形的学习笔记</title><meta name="description" content="从资产定价的实证结果出发，用五组模拟拆解信号形状、噪声强度和特征维度对样本外表现的影响。"><link rel="stylesheet" href="../../note-reader.css"></head><body><header><a class="brand" href="../../">⬡ 六边形的学习笔记</a><a href="../../modules/learning/">返回知识与方法</a></header><main><div class="breadcrumb">知识与方法 <span>/</span> 学习笔记</div><h1>复杂模型何时有用？资产定价与蒙特卡洛实验</h1><p class="summary">从资产定价的实证结果出发，用五组模拟拆解信号形状、噪声强度和特征维度对样本外表现的影响。</p><p class="meta">整理于 2026 年 11 月 23 日</p><nav class="toc" aria-label="文章目录"><a href="#s1">从资产定价的问题出发</a><a href="#s2">用五种数据生成过程拆开问题</a><a href="#s3">怎样做样本外比较</a><a href="#s4">五种情形的实验结果</a><a href="#s5">用结果判断下一步</a><a href="#notebook">完整 Notebook</a></nav><article><section id="s1"><h2>从资产定价的问题出发</h2><p>讲义以 Gu、Kelly 和 Xiu（2020）的研究为例。给定时点 t 已知的公司特征与宏观变量，目标是估计下一期股票超额收益的条件期望，也就是风险溢价。作者用 94 个公司特征分别与 8 个宏观变量及常数项相乘，再加上 74 个行业指标，共得到 920 个预测变量。</p><p>研究按时间划分数据，初始训练期为 1957–1974 年，验证期为 1975–1986 年，样本外测试期为 1987–2016 年，并按年重新估计。论文表 1 以零超额收益预测为基准。全特征线性回归（Huber 损失）的个股月度样本外 R² 为 −3.46%，只选规模、价值和动量的线性模型为 0.16%，随机森林为 0.33%，三层神经网络为 0.40%。全量特征容易带来过拟合，非线性模型捕捉的交互在这批数据上提供了额外的预测信息。</p></section>
 <section id="s2"><h2>用五种数据生成过程拆开问题</h2><p>Notebook 让结果满足 Y = g(X) + σε，特征 Xⱼ 与噪声 ε 相互独立且服从标准正态分布。每种情形的真实信号 g(X) 方差都是 1。前四组有 10 个预测变量，最后一组有 100 个。</p><div class="table-scroll"><table><caption>五种数据生成过程</caption><thead><tr><th scope="col">情形</th><th scope="col">真实信号 g(X)</th><th scope="col">噪声标准差 σ</th></tr></thead><tbody><tr><th scope="row">稀疏线性</th><td>X₁</td><td>1</td></tr><tr><th scope="row">非线性</th><td>(X₁² − 1) / √2</td><td>1</td></tr><tr><th scope="row">变量交互</th><td>X₁ × X₂</td><td>1</td></tr><tr><th scope="row">低信噪比</th><td>X₁</td><td>5</td></tr><tr><th scope="row">分散的弱信号</th><td>(X₁ + ⋯ + X₁₀₀) / 10</td><td>1</td></tr></tbody></table></div></section>
 <section id="s3"><h2>怎样做样本外比较</h2><p>每种情形用从 2026 开始的 5 个随机种子重复实验，每次生成 300 条训练样本、150 条验证样本和 500 条测试样本。候选模型在训练集拟合，按验证集 MSE 选参数，再用训练和验证数据重新拟合。同一轮的所有模型共用测试集，标准化和降维随管线拟合。</p><p>比较对象包括普通最小二乘（OLS）、Ridge／Lasso／Elastic Net 正则化、主成分回归（PCR）、偏最小二乘（PLS）、随机森林、梯度提升树和多层感知机（MLP）。PCR 按特征方差提取成分，PLS 在构建成分时也利用训练目标的信息。</p><p>样本外 R² = 1 − 模型测试 MSE ÷ 基准测试 MSE。模拟用训练集和验证集的 Y 均值作基准，因此 0% 表示持平，负值表示模型误差更大。模拟还可以直接计算预测值与真实信号 g(X) 之间的 MSE。用真实信号预测的 Oracle 在这项指标上误差为零，对含噪声的 Y 仍有预测误差。</p></section>
 <section id="s4"><h2>五种情形的实验结果</h2><p>下表为 Notebook 保存的 5 次测试结果的平均样本外 R²。二次 OLS 预先使用 X₁、X₂ 的平方项和交互项，是用来衡量已知结构有多大价值的对照。</p><div class="table-scroll"><table><caption>五次实验的平均样本外 R²</caption><thead><tr><th scope="col">情形</th><th scope="col">OLS</th><th scope="col">表现最好的常规模型</th><th scope="col">二次 OLS</th><th scope="col">Oracle</th></tr></thead><tbody><tr><th scope="row">稀疏线性</th><td>49.05%</td><td>Lasso 49.75%</td><td>49.61%</td><td>50.18%</td></tr><tr><th scope="row">非线性</th><td>−4.13%</td><td>随机森林 43.68%</td><td>48.14%</td><td>48.77%</td></tr><tr><th scope="row">变量交互</th><td>−5.39%</td><td>MLP 28.36%</td><td>49.72%</td><td>50.30%</td></tr><tr><th scope="row">低信噪比</th><td>2.08%</td><td>Lasso 3.27%</td><td>3.14%</td><td>4.24%</td></tr><tr><th scope="row">分散的弱信号</th><td>36.13%</td><td>Ridge 37.48%</td><td>−0.60%</td><td>51.30%</td></tr></tbody></table></div></section>
-<section id="s5"><h2>用结果判断下一步</h2><ul><li>先判断信号的形状。稀疏线性组的 OLS 已接近 Oracle。平方项和交互项破坏了原始特征上的线性设定，树或神经网络能找回一部分信号，有结构先验时，补进正确特征的二次 OLS 更接近 Oracle。</li><li>低信噪比会压缩改进空间。噪声标准差从 1 升至 5 后，真实信号占总体方差的比例从 50% 降至约 3.85%。这组 MLP 平均为 −0.84%，仅 2 次超过均值基线。</li><li>区分整体信噪比低与单个特征弱。100 个小系数的信号加起来仍占总体方差的一半。Ridge 会收缩系数并保留各个特征，本轮平均优于 OLS 和 Lasso。差距需更多重复来检验。</li><li>把简单基线、结构先验和稳定性一起看。交互组的 MLP 平均为 28.36%，五次结果的标准差为 10.09 个百分点。这个模拟使用独立样本，迁移到真实收益预测时需要用时间顺序做样本外检验，并把基准保持一致。</li></ul></section></article><section class="references"><h2>查阅文档</h2><ul><li><a href="https://dachxiu.chicagobooth.edu/download/ML.pdf#page=27" target="_blank" rel="noopener noreferrer">Gu、Kelly、Xiu（2020），Empirical Asset Pricing via Machine Learning，第 2.1–2.2 节与表 1</a></li><li>《复杂模型的力量》课程讲义，第 3–16 页</li><li>Experiment_1_Monte_Carlo.ipynb，数据生成、模型选择、结果表和稳定性统计</li></ul></section><footer><a href="../../">返回六边形首页 →</a></footer></main></body></html>
+<section id="s5"><h2>用结果判断下一步</h2><ul><li>先判断信号的形状。稀疏线性组的 OLS 已接近 Oracle。平方项和交互项破坏了原始特征上的线性设定，树或神经网络能找回一部分信号，有结构先验时，补进正确特征的二次 OLS 更接近 Oracle。</li><li>低信噪比会压缩改进空间。噪声标准差从 1 升至 5 后，真实信号占总体方差的比例从 50% 降至约 3.85%。这组 MLP 平均为 −0.84%，仅 2 次超过均值基线。</li><li>区分整体信噪比低与单个特征弱。100 个小系数的信号加起来仍占总体方差的一半。Ridge 会收缩系数并保留各个特征，本轮平均优于 OLS 和 Lasso。差距需更多重复来检验。</li><li>把简单基线、结构先验和稳定性一起看。交互组的 MLP 平均为 28.36%，五次结果的标准差为 10.09 个百分点。这个模拟使用独立样本，迁移到真实收益预测时需要用时间顺序做样本外检验，并把基准保持一致。</li></ul></section><section id="notebook" class="notebook"><div class="notebook-heading"><h2>完整 Notebook</h2><a href="./Experiment_1_Monte_Carlo.ipynb" download>下载 .ipynb</a></div><div class="notebook-cell" id="notebook-cell-1"><h3>Experiment 1 — Let the Data Speak</h3>
+<h4>Monte Carlo: When does machine learning improve prediction?</h4>
+<p>五种数据生成过程，比较相同样本外测试集上的预测能力。训练、验证、测试严格分离。</p>
+</div>
+<div class="notebook-cell" id="notebook-cell-2"><p class="notebook-prompt">In [1]</p><pre tabindex="0"><code class="language-python">import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler, PolynomialFeatures
+from sklearn.linear_model import LinearRegression, Ridge, Lasso, ElasticNet
+from sklearn.decomposition import PCA
+from sklearn.cross_decomposition import PLSRegression
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.neural_network import MLPRegressor
+from sklearn.model_selection import ParameterGrid
+from sklearn.base import clone
+from sklearn.metrics import mean_squared_error as mse
+from sklearn.exceptions import ConvergenceWarning
+import warnings
+warnings.filterwarnings(&#x27;ignore&#x27;, category=ConvergenceWarning)
+SEED=2026
+N_TRAIN,N_VAL,N_TEST=300,150,500
+N_REP=5 # 正式实验可增加到100
+</code></pre></div>
+<div class="notebook-cell" id="notebook-cell-3"><h4>1. Data-generating processes</h4>
+<p>独立标准正态变量及噪声，<math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>Y</mi><mo>&#x0003D;</mo><mi>g</mi><mo stretchy="false">&#x00028;</mo><mi>X</mi><mo stretchy="false">&#x00029;</mo><mo>&#x0002B;</mo><mi>&#x003C3;</mi><mi>&#x003F5;</mi></mrow></math>。</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Notebook 表格"><table>
+<thead>
+<tr>
+<th>情形</th>
+<th>信号</th>
+<th>噪声标准差</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Linear</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>X</mi><mn>1</mn></msub></mrow></math></td>
+<td>1</td>
+</tr>
+<tr>
+<td>Nonlinear</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mo stretchy="false">&#x00028;</mo><msubsup><mi>X</mi><mn>1</mn><mn>2</mn></msubsup><mo>&#x02212;</mo><mn>1</mn><mo stretchy="false">&#x00029;</mo><mo>&#x0002F;</mo><msqrt><mrow><mn>2</mn></mrow></msqrt></mrow></math></td>
+<td>1</td>
+</tr>
+<tr>
+<td>Interaction</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>X</mi><mn>1</mn></msub><msub><mi>X</mi><mn>2</mn></msub></mrow></math></td>
+<td>1</td>
+</tr>
+<tr>
+<td>Low SNR</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>X</mi><mn>1</mn></msub></mrow></math></td>
+<td>5</td>
+</tr>
+<tr>
+<td>Weak signals</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msubsup><mo>&#x02211;</mo><mrow><mi>j</mi><mo>&#x0003D;</mo><mn>1</mn></mrow><mrow><mn>100</mn></mrow></msubsup><msub><mi>X</mi><mi>j</mi></msub><mo>&#x0002F;</mo><mn>10</mn></mrow></math></td>
+<td>1</td>
+</tr>
+</tbody>
+</table></div>
+<p>前四种有10个预测变量，第五种有100个。信号方差均为1。这里是独立样本实验，不模拟金融时间序列依赖。</p>
+</div>
+<div class="notebook-cell" id="notebook-cell-4"><p class="notebook-prompt">In [2]</p><pre tabindex="0"><code class="language-python">SCENARIOS=[&#x27;Linear&#x27;,&#x27;Nonlinear&#x27;,&#x27;Interaction&#x27;,&#x27;Low SNR&#x27;,&#x27;Weak signals&#x27;]
+def generate(s,n,rng):
+    p=100 if s==&#x27;Weak signals&#x27; else 10
+    X=rng.normal(size=(n,p))
+    if s in [&#x27;Linear&#x27;,&#x27;Low SNR&#x27;]: g=X[:,0]
+    elif s==&#x27;Nonlinear&#x27;: g=(X[:,0]**2-1)/np.sqrt(2)
+    elif s==&#x27;Interaction&#x27;: g=X[:,0]*X[:,1]
+    else: g=X.sum(axis=1)/np.sqrt(p)
+    return X,g+(5 if s==&#x27;Low SNR&#x27; else 1)*rng.normal(size=n),g
+fig,axes=plt.subplots(1,3,figsize=(12,3.5))
+for ax,s in zip(axes,[&#x27;Linear&#x27;,&#x27;Nonlinear&#x27;,&#x27;Low SNR&#x27;]):
+    X,y,g=generate(s,300,np.random.default_rng(SEED))
+    k=np.argsort(X[:,0]); ax.scatter(X[:,0],y,s=10,alpha=.4); ax.plot(X[k,0],g[k],label=&#x27;True signal&#x27;); ax.set(title=s,xlabel=&#x27;X1&#x27;,ylabel=&#x27;Y&#x27;); ax.legend()
+plt.tight_layout(); plt.show()</code></pre><div class="notebook-outputs"><figure><a href="notebook/cell-04-output-01.png" target="_blank" rel="noopener"><img src="notebook/cell-04-output-01.png" alt="线性、非线性与低信噪比情形的散点图和真实信号" width="1190" height="340" loading="lazy"></a></figure></div></div>
+<div class="notebook-cell" id="notebook-cell-5"><h4>2. Prediction toolbox</h4>
+<p>验证集选择超参数；标准化、降维均在训练集内部拟合。选择后合并训练和验证集重新估计。额外加入知道前两个变量位置的二次 OLS 作为结构知识对照，而非公平的自动发现结构竞争者。</p>
+</div>
+<div class="notebook-cell" id="notebook-cell-6"><p class="notebook-prompt">In [3]</p><pre tabindex="0"><code class="language-python">def toolbox(seed):
+    return {
+    &#x27;OLS&#x27;:(make_pipeline(StandardScaler(),LinearRegression()),{}),
+    &#x27;Ridge&#x27;:(make_pipeline(StandardScaler(),Ridge()),{&#x27;ridge__alpha&#x27;:[1,30,300]}),
+    &#x27;Lasso&#x27;:(make_pipeline(StandardScaler(),Lasso(max_iter=3000)),{&#x27;lasso__alpha&#x27;:[.01,.05,.2]}),
+    &#x27;Elastic Net&#x27;:(make_pipeline(StandardScaler(),ElasticNet(max_iter=3000)),{&#x27;elasticnet__alpha&#x27;:[.01,.1],&#x27;elasticnet__l1_ratio&#x27;:[.2,.8]}),
+    &#x27;PCR&#x27;:(make_pipeline(StandardScaler(),PCA(random_state=seed),LinearRegression()),{&#x27;pca__n_components&#x27;:[1,5,10]}),
+    &#x27;PLS&#x27;:(make_pipeline(StandardScaler(),PLSRegression(scale=False)),{&#x27;plsregression__n_components&#x27;:[1,3,5]}),
+    &#x27;Random Forest&#x27;:(RandomForestRegressor(n_estimators=40,random_state=seed,n_jobs=1),{&#x27;max_depth&#x27;:[3,8],&#x27;max_features&#x27;:[.5,1.]}),
+    &#x27;Gradient Boosting&#x27;:(GradientBoostingRegressor(n_estimators=60,random_state=seed),{&#x27;max_depth&#x27;:[1,3],&#x27;learning_rate&#x27;:[.05,.1]}),
+    &#x27;Neural Network&#x27;:(make_pipeline(StandardScaler(),MLPRegressor(random_state=seed,max_iter=200)),{&#x27;mlpregressor__hidden_layer_sizes&#x27;:[(16,),(32,16)],&#x27;mlpregressor__alpha&#x27;:[.01,.1]})}
+def fit_select(est,grid,Xtr,ytr,Xv,yv):
+    best_loss=np.inf
+    for params in ParameterGrid(grid):
+        model=clone(est).set_params(**params).fit(Xtr,ytr)
+        loss=mse(yv,model.predict(Xv).ravel())
+        if loss&lt;best_loss: best_loss,best=loss,params
+    return clone(est).set_params(**best).fit(np.vstack([Xtr,Xv]),np.r_[ytr,yv])</code></pre></div>
+<div class="notebook-cell" id="notebook-cell-7"><h4>3. Out-of-sample evaluation</h4>
+<p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msubsup><mi>R</mi><mrow><mi>O</mi><mi>S</mi></mrow><mn>2</mn></msubsup><mo>&#x0003D;</mo><mn>1</mn><mo>&#x02212;</mo><mfrac><mrow><msub><mo>&#x02211;</mo><mrow><mi>t</mi><mi>e</mi><mi>s</mi><mi>t</mi></mrow></msub><mo stretchy="false">&#x00028;</mo><msub><mi>y</mi><mi>i</mi></msub><mo>&#x02212;</mo><msub><mover accent="true"><mi>y</mi><mo>&#x0005E;</mo></mover><mi>i</mi></msub><msup><mo stretchy="false">&#x00029;</mo><mn>2</mn></msup></mrow><mrow><msub><mo>&#x02211;</mo><mrow><mi>t</mi><mi>e</mi><mi>s</mi><mi>t</mi></mrow></msub><mo stretchy="false">&#x00028;</mo><msub><mi>y</mi><mi>i</mi></msub><mo>&#x02212;</mo><msub><mover><mi>y</mi><mo stretchy="true">&#x000AF;</mo></mover><mrow><mi>t</mi><mi>r</mi><mi>a</mi><mi>i</mi><mi>n</mi><mo>&#x0002B;</mo><mi>v</mi><mi>a</mi><mi>l</mi></mrow></msub><msup><mo stretchy="false">&#x00029;</mo><mn>2</mn></msup></mrow></mfrac><mo>&#x0002E;</mo></mrow></math>
+正值表示战胜历史均值。Oracle 使用真实信号，仅为参照。另计算信号估计误差 <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mrow><mi mathvariant="normal">M</mi><mi mathvariant="normal">S</mi><mi mathvariant="normal">E</mi></mrow><mi>g</mi></msub><mo>&#x0003D;</mo><mfrac><mn>1</mn><mrow><msub><mi>n</mi><mrow><mi>t</mi><mi>e</mi><mi>s</mi><mi>t</mi></mrow></msub></mrow></mfrac><msub><mo>&#x02211;</mo><mi>i</mi></msub><mo stretchy="false">&#x00028;</mo><msub><mover accent="true"><mi>y</mi><mo>&#x0005E;</mo></mover><mi>i</mi></msub><mo>&#x02212;</mo><mi>g</mi><mo stretchy="false">&#x00028;</mo><msub><mi>X</mi><mi>i</mi></msub><mo stretchy="false">&#x00029;</mo><msup><mo stretchy="false">&#x00029;</mo><mn>2</mn></msup></mrow></math>。</p>
+</div>
+<div class="notebook-cell" id="notebook-cell-8"><p class="notebook-prompt">In [4]</p><pre tabindex="0"><code class="language-python">def run_once(s,rep):
+    seed=SEED+rep
+    X,y,g=generate(s,N_TRAIN+N_VAL+N_TEST,np.random.default_rng(seed))
+    a,b=N_TRAIN,N_TRAIN+N_VAL
+    Xtr,Xv,Xte=X[:a],X[a:b],X[b:]; ytr,yv,yte=y[:a],y[a:b],y[b:]
+    base=np.full(len(yte),y[:b].mean()); base_mse=mse(yte,base)
+    rows=[]
+    def record(name,pred):
+        pred=np.asarray(pred).ravel(); loss=mse(yte,pred)
+        rows.append(dict(scenario=s,rep=rep,model=name,MSE=loss,R2_OS=1-loss/base_mse,Signal_MSE=mse(g[b:],pred)))
+    record(&#x27;Historical Average&#x27;,base); record(&#x27;Oracle&#x27;,g[b:])
+    for name,(est,grid) in toolbox(seed).items():
+        model=fit_select(est,grid,Xtr,ytr,Xv,yv); record(name,model.predict(Xte))
+    poly=make_pipeline(PolynomialFeatures(2,include_bias=False),StandardScaler(),LinearRegression()).fit(X[:b,:2],y[:b])
+    record(&#x27;Polynomial OLS (informed)&#x27;,poly.predict(Xte[:,:2]))
+    return rows</code></pre></div>
+<div class="notebook-cell" id="notebook-cell-9"><p class="notebook-prompt">In [5]</p><pre tabindex="0"><code class="language-python">rows=[]
+for s in SCENARIOS:
+    for rep in range(N_REP): rows.extend(run_once(s,rep))
+    print(&#x27;Finished:&#x27;,s)
+results=pd.DataFrame(rows)
+table=results.groupby([&#x27;scenario&#x27;,&#x27;model&#x27;]).R2_OS.mean().unstack().reindex(SCENARIOS)*100
+display(table.round(2))</code></pre><div class="notebook-outputs"><pre class="notebook-stream" tabindex="0">Finished: Linear
+Finished: Nonlinear
+Finished: Interaction
+Finished: Low SNR
+Finished: Weak signals
+</pre><div class="table-scroll" tabindex="0" role="region" aria-label="Notebook 表格"><table>
+  <thead>
+    <tr>
+      <th>model</th>
+      <th>Elastic Net</th>
+      <th>Gradient Boosting</th>
+      <th>Historical Average</th>
+      <th>Lasso</th>
+      <th>Neural Network</th>
+      <th>OLS</th>
+      <th>Oracle</th>
+      <th>PCR</th>
+      <th>PLS</th>
+      <th>Polynomial OLS (informed)</th>
+      <th>Random Forest</th>
+      <th>Ridge</th>
+    </tr>
+    <tr>
+      <th>scenario</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Linear</th>
+      <td>49.31</td>
+      <td>47.51</td>
+      <td>0.0</td>
+      <td>49.75</td>
+      <td>42.65</td>
+      <td>49.05</td>
+      <td>50.18</td>
+      <td>49.05</td>
+      <td>48.40</td>
+      <td>49.61</td>
+      <td>46.97</td>
+      <td>49.01</td>
+    </tr>
+    <tr>
+      <th>Nonlinear</th>
+      <td>-1.34</td>
+      <td>43.44</td>
+      <td>0.0</td>
+      <td>-1.32</td>
+      <td>29.70</td>
+      <td>-4.13</td>
+      <td>48.77</td>
+      <td>-0.60</td>
+      <td>-4.19</td>
+      <td>48.14</td>
+      <td>43.68</td>
+      <td>-2.09</td>
+    </tr>
+    <tr>
+      <th>Interaction</th>
+      <td>-2.25</td>
+      <td>10.39</td>
+      <td>0.0</td>
+      <td>-2.91</td>
+      <td>28.36</td>
+      <td>-5.39</td>
+      <td>50.30</td>
+      <td>-2.28</td>
+      <td>-5.38</td>
+      <td>49.72</td>
+      <td>17.69</td>
+      <td>-3.37</td>
+    </tr>
+    <tr>
+      <th>Low SNR</th>
+      <td>2.81</td>
+      <td>2.77</td>
+      <td>0.0</td>
+      <td>3.27</td>
+      <td>-0.84</td>
+      <td>2.08</td>
+      <td>4.24</td>
+      <td>-0.17</td>
+      <td>1.93</td>
+      <td>3.14</td>
+      <td>1.14</td>
+      <td>2.42</td>
+    </tr>
+    <tr>
+      <th>Weak signals</th>
+      <td>35.14</td>
+      <td>7.10</td>
+      <td>0.0</td>
+      <td>34.89</td>
+      <td>9.68</td>
+      <td>36.13</td>
+      <td>51.30</td>
+      <td>2.42</td>
+      <td>36.18</td>
+      <td>-0.60</td>
+      <td>8.40</td>
+      <td>37.48</td>
+    </tr>
+  </tbody>
+</table></div></div></div>
+<div class="notebook-cell" id="notebook-cell-10"><h4>4. Who wins?</h4>
+</div>
+<div class="notebook-cell" id="notebook-cell-11"><p class="notebook-prompt">In [6]</p><pre tabindex="0"><code class="language-python">for s in SCENARIOS:
+    fig,ax=plt.subplots(figsize=(8,4)); table.loc[s].sort_values().plot.barh(ax=ax); ax.axvline(0); ax.set(title=s,xlabel=&#x27;Mean out-of-sample R² (%)&#x27;); plt.tight_layout(); plt.show()</code></pre><div class="notebook-outputs"><figure><a href="notebook/cell-11-output-01.png" target="_blank" rel="noopener"><img src="notebook/cell-11-output-01.png" alt="线性情形中各模型的平均样本外 R²" width="790" height="390" loading="lazy"></a></figure><figure><a href="notebook/cell-11-output-02.png" target="_blank" rel="noopener"><img src="notebook/cell-11-output-02.png" alt="非线性情形中各模型的平均样本外 R²" width="790" height="390" loading="lazy"></a></figure><figure><a href="notebook/cell-11-output-03.png" target="_blank" rel="noopener"><img src="notebook/cell-11-output-03.png" alt="变量交互情形中各模型的平均样本外 R²" width="790" height="390" loading="lazy"></a></figure><figure><a href="notebook/cell-11-output-04.png" target="_blank" rel="noopener"><img src="notebook/cell-11-output-04.png" alt="低信噪比情形中各模型的平均样本外 R²" width="790" height="390" loading="lazy"></a></figure><figure><a href="notebook/cell-11-output-05.png" target="_blank" rel="noopener"><img src="notebook/cell-11-output-05.png" alt="分散弱信号情形中各模型的平均样本外 R²" width="790" height="390" loading="lazy"></a></figure></div></div>
+<div class="notebook-cell" id="notebook-cell-12"><h4>5. Stability</h4>
+<p>重复次数较少时仅供课堂演示，不作显著性推断。</p>
+</div>
+<div class="notebook-cell" id="notebook-cell-13"><p class="notebook-prompt">In [7]</p><pre tabindex="0"><code class="language-python">stability=results.groupby([&#x27;scenario&#x27;,&#x27;model&#x27;]).R2_OS.agg(mean=&#x27;mean&#x27;,std=&#x27;std&#x27;,win_rate=lambda x:(x&gt;0).mean())
+display((100*stability).round(2))
+display(results.groupby([&#x27;scenario&#x27;,&#x27;model&#x27;]).Signal_MSE.mean().unstack().reindex(SCENARIOS).round(3))</code></pre><div class="notebook-outputs"><div class="table-scroll" tabindex="0" role="region" aria-label="Notebook 表格"><table>
+  <thead>
+    <tr>
+      <th></th>
+      <th></th>
+      <th>mean</th>
+      <th>std</th>
+      <th>win_rate</th>
+    </tr>
+    <tr>
+      <th>scenario</th>
+      <th>model</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="12">Interaction</th>
+      <th>Elastic Net</th>
+      <td>-2.25</td>
+      <td>1.73</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>Gradient Boosting</th>
+      <td>10.39</td>
+      <td>3.63</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>Historical Average</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>Lasso</th>
+      <td>-2.91</td>
+      <td>2.32</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>Neural Network</th>
+      <td>28.36</td>
+      <td>10.09</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>OLS</th>
+      <td>-5.39</td>
+      <td>2.36</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>Oracle</th>
+      <td>50.30</td>
+      <td>3.25</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>PCR</th>
+      <td>-2.28</td>
+      <td>3.19</td>
+      <td>20.0</td>
+    </tr>
+    <tr>
+      <th>PLS</th>
+      <td>-5.38</td>
+      <td>2.36</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>Polynomial OLS (informed)</th>
+      <td>49.72</td>
+      <td>3.60</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>Random Forest</th>
+      <td>17.69</td>
+      <td>8.18</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>Ridge</th>
+      <td>-3.37</td>
+      <td>2.12</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th rowspan="12">Linear</th>
+      <th>Elastic Net</th>
+      <td>49.31</td>
+      <td>3.10</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>Gradient Boosting</th>
+      <td>47.51</td>
+      <td>2.00</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>Historical Average</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>Lasso</th>
+      <td>49.75</td>
+      <td>2.65</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>Neural Network</th>
+      <td>42.65</td>
+      <td>3.35</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>OLS</th>
+      <td>49.05</td>
+      <td>3.36</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>Oracle</th>
+      <td>50.18</td>
+      <td>2.99</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>PCR</th>
+      <td>49.05</td>
+      <td>3.36</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>PLS</th>
+      <td>48.40</td>
+      <td>2.95</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>Polynomial OLS (informed)</th>
+      <td>49.61</td>
+      <td>3.06</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>Random Forest</th>
+      <td>46.97</td>
+      <td>1.94</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>Ridge</th>
+      <td>49.01</td>
+      <td>3.34</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th rowspan="12">Low SNR</th>
+      <th>Elastic Net</th>
+      <td>2.81</td>
+      <td>1.75</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>Gradient Boosting</th>
+      <td>2.77</td>
+      <td>1.23</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>Historical Average</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>Lasso</th>
+      <td>3.27</td>
+      <td>1.22</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>Neural Network</th>
+      <td>-0.84</td>
+      <td>2.71</td>
+      <td>40.0</td>
+    </tr>
+    <tr>
+      <th>OLS</th>
+      <td>2.08</td>
+      <td>2.39</td>
+      <td>80.0</td>
+    </tr>
+    <tr>
+      <th>Oracle</th>
+      <td>4.24</td>
+      <td>1.89</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>PCR</th>
+      <td>-0.17</td>
+      <td>2.43</td>
+      <td>20.0</td>
+    </tr>
+    <tr>
+      <th>PLS</th>
+      <td>1.93</td>
+      <td>2.11</td>
+      <td>80.0</td>
+    </tr>
+    <tr>
+      <th>Polynomial OLS (informed)</th>
+      <td>3.14</td>
+      <td>1.83</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>Random Forest</th>
+      <td>1.14</td>
+      <td>1.43</td>
+      <td>80.0</td>
+    </tr>
+    <tr>
+      <th>Ridge</th>
+      <td>2.42</td>
+      <td>2.18</td>
+      <td>80.0</td>
+    </tr>
+    <tr>
+      <th rowspan="12">Nonlinear</th>
+      <th>Elastic Net</th>
+      <td>-1.34</td>
+      <td>1.50</td>
+      <td>20.0</td>
+    </tr>
+    <tr>
+      <th>Gradient Boosting</th>
+      <td>43.44</td>
+      <td>5.70</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>Historical Average</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>Lasso</th>
+      <td>-1.32</td>
+      <td>1.63</td>
+      <td>20.0</td>
+    </tr>
+    <tr>
+      <th>Neural Network</th>
+      <td>29.70</td>
+      <td>6.70</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>OLS</th>
+      <td>-4.13</td>
+      <td>2.36</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>Oracle</th>
+      <td>48.77</td>
+      <td>6.11</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>PCR</th>
+      <td>-0.60</td>
+      <td>0.85</td>
+      <td>60.0</td>
+    </tr>
+    <tr>
+      <th>PLS</th>
+      <td>-4.19</td>
+      <td>2.28</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>Polynomial OLS (informed)</th>
+      <td>48.14</td>
+      <td>6.65</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>Random Forest</th>
+      <td>43.68</td>
+      <td>5.38</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>Ridge</th>
+      <td>-2.09</td>
+      <td>1.88</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th rowspan="12">Weak signals</th>
+      <th>Elastic Net</th>
+      <td>35.14</td>
+      <td>3.32</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>Gradient Boosting</th>
+      <td>7.10</td>
+      <td>3.80</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>Historical Average</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>Lasso</th>
+      <td>34.89</td>
+      <td>7.35</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>Neural Network</th>
+      <td>9.68</td>
+      <td>4.75</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>OLS</th>
+      <td>36.13</td>
+      <td>6.53</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>Oracle</th>
+      <td>51.30</td>
+      <td>3.72</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>PCR</th>
+      <td>2.42</td>
+      <td>2.47</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>PLS</th>
+      <td>36.18</td>
+      <td>3.56</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>Polynomial OLS (informed)</th>
+      <td>-0.60</td>
+      <td>0.87</td>
+      <td>20.0</td>
+    </tr>
+    <tr>
+      <th>Random Forest</th>
+      <td>8.40</td>
+      <td>1.01</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>Ridge</th>
+      <td>37.48</td>
+      <td>3.09</td>
+      <td>100.0</td>
+    </tr>
+  </tbody>
+</table></div><div class="table-scroll" tabindex="0" role="region" aria-label="Notebook 表格"><table>
+  <thead>
+    <tr>
+      <th>model</th>
+      <th>Elastic Net</th>
+      <th>Gradient Boosting</th>
+      <th>Historical Average</th>
+      <th>Lasso</th>
+      <th>Neural Network</th>
+      <th>OLS</th>
+      <th>Oracle</th>
+      <th>PCR</th>
+      <th>PLS</th>
+      <th>Polynomial OLS (informed)</th>
+      <th>Random Forest</th>
+      <th>Ridge</th>
+    </tr>
+    <tr>
+      <th>scenario</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Linear</th>
+      <td>0.015</td>
+      <td>0.051</td>
+      <td>0.978</td>
+      <td>0.012</td>
+      <td>0.123</td>
+      <td>0.027</td>
+      <td>0.0</td>
+      <td>0.027</td>
+      <td>0.031</td>
+      <td>0.016</td>
+      <td>0.062</td>
+      <td>0.026</td>
+    </tr>
+    <tr>
+      <th>Nonlinear</th>
+      <td>0.924</td>
+      <td>0.095</td>
+      <td>0.904</td>
+      <td>0.922</td>
+      <td>0.305</td>
+      <td>0.978</td>
+      <td>0.0</td>
+      <td>0.909</td>
+      <td>0.978</td>
+      <td>0.016</td>
+      <td>0.094</td>
+      <td>0.940</td>
+    </tr>
+    <tr>
+      <th>Interaction</th>
+      <td>1.041</td>
+      <td>0.793</td>
+      <td>1.000</td>
+      <td>1.049</td>
+      <td>0.405</td>
+      <td>1.092</td>
+      <td>0.0</td>
+      <td>1.042</td>
+      <td>1.092</td>
+      <td>0.016</td>
+      <td>0.638</td>
+      <td>1.056</td>
+    </tr>
+    <tr>
+      <th>Low SNR</th>
+      <td>0.465</td>
+      <td>0.508</td>
+      <td>1.081</td>
+      <td>0.338</td>
+      <td>1.077</td>
+      <td>0.667</td>
+      <td>0.0</td>
+      <td>0.772</td>
+      <td>0.640</td>
+      <td>0.394</td>
+      <td>0.814</td>
+      <td>0.489</td>
+    </tr>
+    <tr>
+      <th>Weak signals</th>
+      <td>0.310</td>
+      <td>0.856</td>
+      <td>0.992</td>
+      <td>0.319</td>
+      <td>0.852</td>
+      <td>0.298</td>
+      <td>0.0</td>
+      <td>0.945</td>
+      <td>0.281</td>
+      <td>0.991</td>
+      <td>0.843</td>
+      <td>0.255</td>
+    </tr>
+  </tbody>
+</table></div></div></div>
+<div class="notebook-cell" id="notebook-cell-14"><h4>6. Discussion</h4>
+<ul>
+<li>Linear：OLS 是否足够？</li>
+<li>Nonlinear / Interaction：灵活模型是否有优势？知道正确结构的传统模型呢？</li>
+<li>Low SNR：理论信号占总方差的 1/26，谁能稳定战胜均值？</li>
+<li>Weak signals：收缩还是变量选择？</li>
+<li>真实数据没有 Oracle，如何判断模型学到的是信号还是噪声？</li>
+</ul>
+<p><strong>Complexity is useful only when it improves prediction.</strong></p>
+</div>
+</section></article><section class="references"><h2>查阅文档</h2><ul><li><a href="https://dachxiu.chicagobooth.edu/download/ML.pdf#page=27" target="_blank" rel="noopener noreferrer">Gu、Kelly、Xiu（2020），Empirical Asset Pricing via Machine Learning，第 2.1–2.2 节与表 1</a></li><li>《复杂模型的力量》课程讲义，第 3–16 页</li><li>Experiment_1_Monte_Carlo.ipynb，数据生成、模型选择、结果表和稳定性统计</li></ul></section><footer><a href="../../">返回六边形首页 →</a></footer></main></body></html>

@@ -53,6 +53,10 @@ Notebook 让结果满足 Y = g(X) + σε，特征 Xⱼ 与噪声 ε 相互独立
 - 区分整体信噪比低与单个特征弱。100 个小系数的信号加起来仍占总体方差的一半。Ridge 会收缩系数并保留各个特征，本轮平均优于 OLS 和 Lasso。差距需更多重复来检验。
 - 把简单基线、结构先验和稳定性一起看。交互组的 MLP 平均为 28.36%，五次结果的标准差为 10.09 个百分点。这个模拟使用独立样本，迁移到真实收益预测时需要用时间顺序做样本外检验，并把基准保持一致。
 
+## 完整 Notebook
+
+[下载 Experiment_1_Monte_Carlo.ipynb](./Experiment_1_Monte_Carlo.ipynb)
+
 ## 查阅文档
 
 - [Gu、Kelly、Xiu（2020），Empirical Asset Pricing via Machine Learning，第 2.1–2.2 节与表 1](https://dachxiu.chicagobooth.edu/download/ML.pdf#page=27)

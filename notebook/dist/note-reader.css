@@ -11,3 +11,20 @@ article th,article td{padding:10px 12px;border-bottom:1px solid var(--line);text
 article thead th{background:#f5f5f5;font-weight:650}
 article tbody th{font-weight:550}
 @media(max-width:600px){article th,article td{padding:8px 6px}article table{font-size:13px}}
+
+.notebook{border-top:1px solid var(--line);padding-top:28px}
+.notebook-heading{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:24px}
+.notebook-heading h2{margin:0}
+.notebook-heading a{font-size:14px}
+.notebook-cell{margin:22px 0}
+.notebook-cell h3{font-family:"Noto Serif SC","SimSun",serif;font-size:25px;margin:24px 0 12px}
+.notebook-cell h4{font-size:18px;margin:20px 0 10px}
+.notebook-cell .notebook-prompt{color:var(--muted);font-family:Consolas,monospace;font-size:12px;margin:0 0 4px}
+.notebook-cell pre{margin:0 0 12px;padding:14px}
+.notebook-cell .notebook-stream{background:#fafafa}
+.notebook-cell .table-scroll{margin:16px 0}
+.notebook-cell .table-scroll table{width:max-content;min-width:100%}
+.notebook-cell figure{margin:12px 0}
+.notebook-cell figure img{display:block;max-width:100%;height:auto}
+.notebook-cell math[display="block"]{overflow-x:auto;padding:6px 0}
+@media(max-width:600px){.notebook-cell h3{font-size:21px}.notebook-cell pre{font-size:12px}}

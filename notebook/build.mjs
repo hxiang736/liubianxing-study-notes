@@ -52,7 +52,12 @@ for(const note of learning){
     ...sources.map(s=>`<li><a href="${h(s.url)}" target="_blank" rel="noopener noreferrer">${h(s.title)}</a></li>`),
     ...materials.map(s=>`<li>${h(s)}</li>`),
   ];
-  const html=`<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${h(note.title)} · 六边形的学习笔记</title><meta name="description" content="${h(note.summary)}"><link rel="stylesheet" href="../../note-reader.css"></head><body><header><a class="brand" href="../../">⬡ 六边形的学习笔记</a><a href="../../modules/${h(category.id)}/">返回${h(category.entryLabel)}</a></header><main><div class="breadcrumb">${h(category.entryLabel)} <span>/</span> 学习笔记</div><h1>${h(note.title)}</h1><p class="summary">${h(note.summary)}</p><p class="meta">整理于 ${year} 年 ${month} 月 ${day} 日</p><nav class="toc" aria-label="文章目录">${note.sections.map((s,i)=>`<a href="#s${i+1}">${h(s.heading)}</a>`).join('')}</nav><article>${sections}</article>${references.length?`<section class="references"><h2>查阅文档</h2><ul>${references.join('')}</ul></section>`:''}<footer><a href="../../">返回六边形首页 →</a></footer></main></body></html>`;
+  let notebookAppendix='';
+  if(note.notebookFile){
+    const cells=await readFile(path.join(root,'content','notebook-exports',note.slug+'.html'),'utf8');
+    notebookAppendix=`<section id="notebook" class="notebook"><div class="notebook-heading"><h2>完整 Notebook</h2><a href="./${h(note.notebookFile)}" download>下载 .ipynb</a></div>${cells}</section>`;
+  }
+  const html=`<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${h(note.title)} · 六边形的学习笔记</title><meta name="description" content="${h(note.summary)}"><link rel="stylesheet" href="../../note-reader.css"></head><body><header><a class="brand" href="../../">⬡ 六边形的学习笔记</a><a href="../../modules/${h(category.id)}/">返回${h(category.entryLabel)}</a></header><main><div class="breadcrumb">${h(category.entryLabel)} <span>/</span> 学习笔记</div><h1>${h(note.title)}</h1><p class="summary">${h(note.summary)}</p><p class="meta">整理于 ${year} 年 ${month} 月 ${day} 日</p><nav class="toc" aria-label="文章目录">${note.sections.map((s,i)=>`<a href="#s${i+1}">${h(s.heading)}</a>`).join('')}${notebookAppendix?'<a href="#notebook">完整 Notebook</a>':''}</nav><article>${sections}${notebookAppendix}</article>${references.length?`<section class="references"><h2>查阅文档</h2><ul>${references.join('')}</ul></section>`:''}<footer><a href="../../">返回六边形首页 →</a></footer></main></body></html>`;
   await writeFile(path.join(noteRoot,'index.html'),html);
   const md=['# '+note.title,'',note.summary,'','整理日期 '+entry.date,''];
   for(const s of note.sections){
@@ -60,6 +65,7 @@ for(const note of learning){
     if(s.table)md.push(...tableLines(s.table),'');
     if(s.code)md.push('```',s.code,'```','');
   }
+  if(note.notebookFile)md.push('## 完整 Notebook','','[下载 '+note.notebookFile+'](./'+note.notebookFile+')','');
   if(references.length)md.push('## 查阅文档','',...sources.map(s=>'- ['+s.title+']('+s.url+')'),...materials.map(s=>'- '+s),'');
   await writeFile(path.join(noteRoot,'note.md'),md.join('\n'));
 }
