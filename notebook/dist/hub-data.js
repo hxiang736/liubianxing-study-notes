@@ -28,6 +28,18 @@ window.HUB_DATA = {
       ]
     },
     {
+      "id": "data-tableau",
+      "title": "Tableau 实战笔记｜数据关联、排错与图表",
+      "summary": "以成交与获客分析为例，记录数据提取、日期与 Null 排查、分层下钻、标签、双轴和标靶图。",
+      "date": "2026-11-23",
+      "url": "./notes/tableau-workflow/",
+      "tags": [
+        "Tableau",
+        "数据分析",
+        "数据可视化"
+      ]
+    },
+    {
       "id": "data-python",
       "title": "Python 数据清洗 连接与聚合",
       "summary": "把几次 pandas 排错整理成一条可复用的思路：按字段含义清洗，校验连接关系，再用手算结果检验汇总。",
@@ -76,6 +88,7 @@ window.HUB_DATA = {
         "问题拆解与决策案例"
       ],
       "noteIds": [
+        "data-tableau",
         "data-sql",
         "data-python"
       ]
