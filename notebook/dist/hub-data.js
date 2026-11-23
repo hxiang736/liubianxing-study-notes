@@ -1,7 +1,7 @@
 window.HUB_DATA = {
   "siteTitle": "六边形的学习笔记",
   "description": "六种能力，连接专业学习、沟通表达、行动实践和身心生活。每一次理解与成长，都在这里留下记录。",
-  "updatedAt": "2026-11-16",
+  "updatedAt": "2026-11-23",
   "notes": [
     {
       "id": "career-ai",
@@ -37,6 +37,18 @@ window.HUB_DATA = {
         "数据分析",
         "Python",
         "pandas"
+      ]
+    },
+    {
+      "id": "ml-complexity",
+      "title": "复杂模型何时有用？资产定价与蒙特卡洛实验",
+      "summary": "从资产定价实证出发，用五种模拟情形比较线性模型、正则化、树与神经网络的样本外表现。",
+      "date": "2026-11-23",
+      "url": "./notes/the-power-of-complexity/",
+      "tags": [
+        "机器学习",
+        "资产定价",
+        "蒙特卡洛"
       ]
     },
     {
@@ -79,6 +91,7 @@ window.HUB_DATA = {
         "学习方法与 AI 工具探索"
       ],
       "noteIds": [
+        "ml-complexity",
         "ml-day1"
       ]
     },
