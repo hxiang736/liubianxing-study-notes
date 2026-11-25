@@ -1,7 +1,7 @@
 window.HUB_DATA = {
   "siteTitle": "六边形的学习笔记",
   "description": "六种能力，连接专业学习、沟通表达、行动实践和身心生活。每一次理解与成长，都在这里留下记录。",
-  "updatedAt": "2026-11-23",
+  "updatedAt": "2026-11-25",
   "notes": [
     {
       "id": "career-ai",
@@ -25,6 +25,18 @@ window.HUB_DATA = {
         "数据分析",
         "SQL",
         "指标口径"
+      ]
+    },
+    {
+      "id": "data-sky-rain-umbrella",
+      "title": "空雨伞｜从事实、判断到行动",
+      "summary": "用三个问题把分析写清楚：观察到了什么、这意味着什么、接下来做什么。",
+      "date": "2026-11-25",
+      "url": "./notes/sky-rain-umbrella/",
+      "tags": [
+        "数据分析",
+        "决策",
+        "分析方法"
       ]
     },
     {
@@ -88,6 +100,7 @@ window.HUB_DATA = {
         "问题拆解与决策案例"
       ],
       "noteIds": [
+        "data-sky-rain-umbrella",
         "data-tableau",
         "data-sql",
         "data-python"
